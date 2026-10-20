@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /custom_app/bin/nmap.bin --datadir /custom_app/share/nmap "$@"

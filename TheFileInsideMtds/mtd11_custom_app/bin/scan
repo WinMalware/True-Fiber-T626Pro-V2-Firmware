@@ -1,0 +1,2 @@
+#!/bin/sh
+/custom_app/bin/arp-scan -I br0 --ouifile=/custom_app/etc/ieee-oui.txt -l "$@"

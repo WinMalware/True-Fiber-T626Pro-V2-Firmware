@@ -1,0 +1,14 @@
+#!/bin/sh
+# ========================================================
+# Unmount OverlayFS from System Folders
+# ========================================================
+TARGETS="boaroot userfs/bin usr/script usr/sbin usr/bin sbin"
+
+for d in $TARGETS; do
+    if mount | grep -q "overlay.*on /$d "; then
+        /usr/ubifs/bin/umount -l "/$d" 2>/dev/null || umount "/$d" 2>/dev/null
+        [ $? -eq 0 ] && echo "[✓] Unmounted overlay: /$d" || echo "[✗] Failed to unmount: /$d"
+    else
+        echo "[-] Not mounted: /$d"
+    fi
+done

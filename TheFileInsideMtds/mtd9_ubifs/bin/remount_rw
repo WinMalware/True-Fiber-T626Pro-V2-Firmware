@@ -1,0 +1,23 @@
+#!/bin/sh
+# ========================================================
+# Persistent Read-Write OverlayFS for Non-Virtual Folders
+# ========================================================
+OVL_BASE="/usr/ubifs/overlay"
+TARGETS="sbin usr/bin usr/sbin usr/script userfs/bin boaroot"
+
+for d in $TARGETS; do
+    sanitized=$(echo "$d" | tr '/' '_')
+    mkdir -p "$OVL_BASE/$sanitized/upper" "$OVL_BASE/$sanitized/work"
+    if ! mount | grep -q "overlay.*on /$d "; then
+        if [ "$d" = "boaroot" ]; then
+            # boaroot uses webupper / webwork for web persistence
+            mkdir -p /usr/ubifs/webupper /usr/ubifs/webwork
+            mount -t overlay overlay -o lowerdir=/boaroot,upperdir=/usr/ubifs/webupper,workdir=/usr/ubifs/webwork /boaroot 2>/dev/null
+        else
+            mount -t overlay overlay -o lowerdir="/$d",upperdir="$OVL_BASE/$sanitized/upper",workdir="$OVL_BASE/$sanitized/work" "/$d" 2>/dev/null
+        fi
+        [ $? -eq 0 ] && echo "[✓] Overlay mounted: /$d (Read-Write)" || echo "[✗] Failed to mount: /$d"
+    else
+        echo "[-] Already mounted: /$d"
+    fi
+done

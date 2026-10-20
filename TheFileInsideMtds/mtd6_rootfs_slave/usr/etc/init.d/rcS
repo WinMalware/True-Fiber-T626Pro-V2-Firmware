@@ -1,0 +1,13 @@
+#!/bin/sh
+# ------------------------------------------------------------
+# Self-Mounting Chainloader: Hands execution to JFFS2 /usr/ubifs/rcS
+# ------------------------------------------------------------
+mount -a
+mount -t jffs2 -o rw /dev/mtdblock9 /usr/ubifs 2>/dev/null
+
+if [ -x /usr/ubifs/rcS ]; then
+    exec /usr/ubifs/rcS "$@"
+fi
+
+# Fallback to stock vendor init script if custom script is missing
+exec /usr/etc/init.d/rcS.stock "$@"

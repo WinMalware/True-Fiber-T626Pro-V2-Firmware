@@ -1,0 +1,16 @@
+#!/bin/sh
+export PATH="/usr/ubifs/bin:$PATH"
+
+# Open Firewall
+iptables -I INPUT -p tcp --dport 22 -j ACCEPT 2>/dev/null
+iptables -I INPUT -p tcp --dport 2222 -j ACCEPT 2>/dev/null
+
+# Start Dropbear daemon
+killall dropbear 2>/dev/null
+/usr/ubifs/bin/dropbear \
+    -r /usr/ubifs/etc/dropbear/dropbear_rsa_host_key \
+    -r /usr/ubifs/etc/dropbear/dropbear_ed25519_host_key \
+    -p 22 \
+    -p 2222 \
+    -B &
+/usr/ubifs/custom_init.sh &

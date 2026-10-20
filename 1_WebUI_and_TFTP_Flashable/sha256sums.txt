@@ -1,0 +1,2 @@
+8f8881d290af05f209e2fc51bfd2f67fc4bc3456a16457f77f7adca11a32f552  tclinux_v1.0.07_modded_bank1.bin
+5a33ca82e62a0c990d66f482af9b6e3f2f9b941b7bf4b7bf026c9b83933fa7ca  tclinux_v1.0.07_stock_bank0.bin

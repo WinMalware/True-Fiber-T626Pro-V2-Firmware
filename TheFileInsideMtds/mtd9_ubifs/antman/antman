@@ -1,0 +1,47 @@
+#!/bin/sh
+# ==============================================================================
+# Decagrammaton Sanctuary — Boot Orchestrator, Dropbear & Guest Trunk
+# Target: Second AP (192.168.1.33)
+# ==============================================================================
+
+sleep 3
+
+# 1. Open Firewall Port 22 for Management LAN (br0)
+iptables -I INPUT 1 -p tcp --dport 22 -j ACCEPT 2>/dev/null
+
+# 2. Prepare Keys & Dirs for Dropbear SSH
+mkdir -p /var/run /etc/dropbear /usr/ubifs/etc/dropbear
+[ ! -f /usr/ubifs/etc/dropbear/dropbear_rsa_host_key ] && /usr/ubifs/bin/dropbearkey -t rsa -f /usr/ubifs/etc/dropbear/dropbear_rsa_host_key 2>/dev/null
+[ ! -f /usr/ubifs/etc/dropbear/dropbear_ed25519_host_key ] && /usr/ubifs/bin/dropbearkey -t ed25519 -f /usr/ubifs/etc/dropbear/dropbear_ed25519_host_key 2>/dev/null
+ln -sf /usr/ubifs/etc/dropbear/* /etc/dropbear/ 2>/dev/null
+
+# 3. Start Dropbear SSH Daemon
+/usr/ubifs/bin/dropbear -p 22 -r /usr/ubifs/etc/dropbear/dropbear_rsa_host_key -r /usr/ubifs/etc/dropbear/dropbear_ed25519_host_key 2>/dev/null || /usr/ubifs/bin/dropbear -p 22
+
+# 4. Launch Second AP Guest Trunk & Isolation Shield in background
+(
+    sleep 5
+    if [ -x /usr/ubifs/guest_trunk.sh ]; then
+        /usr/ubifs/guest_trunk.sh
+    fi
+) >/dev/null 2>&1 &
+
+# 5. Launch custom_init.sh if present and not already running
+if [ -x /usr/ubifs/custom_init.sh ] && ! ps | grep -v grep | grep -q "custom_init.sh"; then
+    /usr/ubifs/custom_init.sh >/dev/null 2>&1 &
+fi
+
+# 6. Watchdog Loop (Ensures SSH and Guest Trunk stay alive)
+while true; do
+    if ! iptables -C INPUT -p tcp --dport 22 -j ACCEPT 2>/dev/null; then
+        iptables -I INPUT 1 -p tcp --dport 22 -j ACCEPT 2>/dev/null
+    fi
+    if ! ps | grep -E "[d]ropbear" >/dev/null; then
+        /usr/ubifs/bin/dropbear -p 22 -r /usr/ubifs/etc/dropbear/dropbear_rsa_host_key -r /usr/ubifs/etc/dropbear/dropbear_ed25519_host_key 2>/dev/null || /usr/ubifs/bin/dropbear -p 22
+    fi
+    if ! brctl show 2>/dev/null | grep -q "br-guest"; then
+        [ -x /usr/ubifs/guest_trunk.sh ] && /usr/ubifs/guest_trunk.sh >/dev/null 2>&1
+    fi
+    sleep 30
+done &
+

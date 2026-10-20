@@ -1,0 +1,24 @@
+==============================================================
+   ___ _____ _   _ _____ _   _ _   _ ___   _____ ___  ____  
+  / _ \_   _| | | |___ /| | | | \ | |_ _| |_   _/ _ \|  _ \ 
+ | | | || | | |_| | |_ \| |_| |  \| || |    | || | | | |_) |
+ | |_| || | |  _  |___) |  _  | |\  || |    | || |_| |  __/ 
+  \___/ |_| |_| |_|____/|_| |_|_| \_|___|   |_| \___/|_|    
+==============================================================
+  Hardware: T3 Technology T626ProV2 / Skyworth PT632
+  SoC     : MediaTek / EcoNet EN7529CT (Dual-core ARMv7)
+  DRAM    : 512 MB | Flash: 256 MB SPI NAND
+  Firmware: Dual-Bank Linux 4.4.115 (Active: Bank 1)
+--------------------------------------------------------------
+  Installed Modern Toolkits in /custom_app/bin:
+   * iperf3  - Multi-gigabit throughput benchmark
+   * tcpdump - Full packet capture & sniffing (libpcap 1.10.4)
+   * ethtool - 2.5G / 1G PHY hardware controller
+   * socat   - Multipurpose socket & relay engine
+   * jq      - Command-line JSON processor
+   * strace  - Kernel syscall tracer & debugger
+   * Dropbear- Modern SSH & SCP server (Port 22)
+   * BusyBox - Modern Debian v1.35.0 (250+ standard utilities)
+--------------------------------------------------------------
+  OverlayFS Status: Active (Read-Write across /usr, /userfs, /sbin)
+==============================================================

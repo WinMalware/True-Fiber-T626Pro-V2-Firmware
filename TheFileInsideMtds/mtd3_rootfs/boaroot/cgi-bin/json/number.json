@@ -1,0 +1,3 @@
+{
+	"prinumber1":"<%tcWebApi_get("Account_Entry1","printNumber","s")%>"
+}

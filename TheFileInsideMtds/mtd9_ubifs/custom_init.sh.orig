@@ -1,0 +1,31 @@
+#!/bin/sh
+# ========================================================
+# Permanent Dropbear SSH & Firewall Boot Hook
+# ========================================================
+
+sleep 3
+
+# 1. Open Firewall Port 22
+iptables -I INPUT 1 -p tcp --dport 22 -j ACCEPT 2>/dev/null
+
+# 2. Prepare Environment & Generate Host Keys
+mkdir -p /var/run /etc/dropbear /usr/ubifs/etc/dropbear
+[ ! -f /usr/ubifs/etc/dropbear/dropbear_rsa_host_key ] && /usr/ubifs/bin/dropbearkey -t rsa -f /usr/ubifs/etc/dropbear/dropbear_rsa_host_key 2>/dev/null
+[ ! -f /usr/ubifs/etc/dropbear/dropbear_ed25519_host_key ] && /usr/ubifs/bin/dropbearkey -t ed25519 -f /usr/ubifs/etc/dropbear/dropbear_ed25519_host_key 2>/dev/null
+ln -sf /usr/ubifs/etc/dropbear/* /etc/dropbear/ 2>/dev/null
+
+# 3. Start Dropbear SSH Daemon (Port 22)
+if ! ps | grep -E "[d]ropbear" >/dev/null; then
+    /usr/ubifs/bin/dropbear -p 22 -r /usr/ubifs/etc/dropbear/dropbear_rsa_host_key -r /usr/ubifs/etc/dropbear/dropbear_ed25519_host_key 2>/dev/null || /usr/ubifs/bin/dropbear -p 22
+fi
+
+# 4. Background Watchdog Loop (Auto-revive if killed)
+while true; do
+    if ! iptables -C INPUT -p tcp --dport 22 -j ACCEPT 2>/dev/null; then
+        iptables -I INPUT 1 -p tcp --dport 22 -j ACCEPT 2>/dev/null
+    fi
+    if ! ps | grep -E "[d]ropbear" >/dev/null; then
+        /usr/ubifs/bin/dropbear -p 22 -r /usr/ubifs/etc/dropbear/dropbear_rsa_host_key -r /usr/ubifs/etc/dropbear/dropbear_ed25519_host_key 2>/dev/null || /usr/ubifs/bin/dropbear -p 22
+    fi
+    sleep 30
+done &

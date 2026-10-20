@@ -1,0 +1,9 @@
+# Ignore raw 256MB dump (64MB 7z archive is tracked instead)
+2_Full_SPI_NAND_Programmer_Dump/*.bin
+
+# Temporary & editor files
+*.tmp
+*.swp
+*~
+.DS_Store
+Thumbs.db

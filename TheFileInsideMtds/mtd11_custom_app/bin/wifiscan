@@ -1,0 +1,32 @@
+#!/bin/sh
+# ========================================================
+# Wi-Fi Environmental Scanner for MediaTek MT7916 / MT7915
+# (Passive Site Survey - Scans all nearby Wi-Fi APs)
+# ========================================================
+
+BAND="$1"
+
+scan_band() {
+    IFACE="$1"
+    NAME="$2"
+    echo "========================================================================================"
+    echo "   Scanning $NAME Nearby Networks (Passive Site Survey on $IFACE)..."
+    echo "========================================================================================"
+    iwpriv "$IFACE" set SiteSurvey=1 2>/dev/null
+    sleep 2
+    iwpriv "$IFACE" get_site_survey 2>/dev/null
+    echo ""
+}
+
+case "$BAND" in
+    2|2.4|2.4g|2.4G)
+        scan_band ra0 "2.4 GHz (802.11b/g/n/ax)"
+        ;;
+    5|5g|5G)
+        scan_band rai0 "5 GHz (802.11a/n/ac/ax Wi-Fi 6)"
+        ;;
+    *)
+        scan_band rai0 "5 GHz (802.11a/n/ac/ax Wi-Fi 6)"
+        scan_band ra0 "2.4 GHz (802.11b/g/n/ax)"
+        ;;
+esac
