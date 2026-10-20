@@ -116,4 +116,4 @@ Check out [FLASHING_GUIDE.md](file:///run/media/moonlight/GameLibrary/Firmware%2
 * **No-Flash Toolkit:** Run `install_toolkit.sh` over SSH or Telnet to get all tools instantly.
 * **Serial / TFTP Recovery:** Unbrick soft-bricked units using U-Boot TFTP.
 * **Hardware Programmer:** Unbrick completely dead boards with the full 256MB SPI NAND image.
-* And let me clearify one thing, Yes i use ai, I use ai to help with this while also researching so pelase. i did some Software installation and firmware flashes but the firmware dumps and many things are hard so i had to use ai.
+* And let me clearify one thing, Yes i use ai, I use ai to help with this while also researching so pelase. i did some Software installation and firmware flashes but the firmware dumps and many things are hard so i had to use ai. but of course for UART headers i did a real research
