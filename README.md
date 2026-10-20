@@ -1,13 +1,55 @@
-# True Fiber / T3 Technology T626Pro V2 (Skyworth PT632) Firmware & Modding Archive
+# True Fiber / T3 Technology T626Pro V2 (Thailand Firmware & Modding Archive)
+
+> *full firmware dump, flashables and modded tools for True Fiber T626Pro V2 (Thailand model) so you don't get stuck with isp locks :P*
 
 [![Hardware](https://img.shields.io/badge/Hardware-EcoNet%20EN7529CT%20(ARMv7)-blue.svg)](#)
 [![Flash](https://img.shields.io/badge/Flash-256MB%20SPI%20NAND-green.svg)](#)
 [![Release](https://img.shields.io/badge/Version-v1.0.07-orange.svg)](#)
 [![License](https://img.shields.io/badge/License-GPL%20v2-lightgrey.svg)](#)
 
-A comprehensive firmware preservation, unlocking, and custom modding repository for the **T3 Technology T626Pro V2** (Skyworth PT632 / EcoNet EN7529CT dual-core ARMv7 Wi-Fi 6 router).
+Inspired by [Blinko1987's repo](https://github.com/Blinko1987/True-Fiber-T626Pro-V1.0.0.5-Firmware) for V1 hardware. Since V2 has almost zero public files online and people keep getting bricked or locked by True's firmware, this repo has everything: dual-bank flash dumps, full SPI NAND images, unbricking files, clean unlocked romfiles, and a modern ARMv7 toolkit ready to drop in :D
 
-Inspired by [Blinko1987's True-Fiber-T626Pro-V1.0.0.5-Firmware](https://github.com/Blinko1987/True-Fiber-T626Pro-V1.0.0.5-Firmware), this archive provides full dual-bank firmware images, hardware programmer dumps, clean unlocked romfiles, and a modern Linux toolkit for V2 hardware.
+---
+
+## ⚡ How to Unlock Telnet & Find UART
+
+If your router is locked down and you need shell access, you can get in either through UART serial or the hidden webpage.
+
+### ⚠️ IMPORTANT SAFETY WARNING
+> **NEVER EVER connect a pin to VCC!**  
+> Seriously, do not connect the VCC pin from your USB-to-TTL to the board. You will risk frying the UART pins or the entire SoC! Only connect **GND**, **TX**, and **RX**.
+
+### 1. Locating the UART Header
+You can solder header pins or use pogo pins / Dupont wires with your USB-to-TTL adapter:
+
+| Board Overview | UART Header Closeup |
+| :---: | :---: |
+| ![UART Board Overview](images/uart_board_overview.jpg) | ![UART Header Closeup](images/uart_header_closeup.jpg) |
+
+* **Baud Rate:** `115200` (8 data bits, no parity, 1 stop bit, no flow control)
+* **Logic Level:** 3.3V TTL (Make sure your USB adapter jumper is set to 3.3V, not 5V!)
+* **Connections:**
+  * Router `GND` ➔ USB-TTL `GND`
+  * Router `TX` ➔ USB-TTL `RX`
+  * Router `RX` ➔ USB-TTL `TX`
+  * Router `VCC` ➔ **LEAVE DISCONNECTED!**
+
+### 2. Steps to Unlock Telnet via UART Shell
+Once you plug the power in and open your serial terminal (`picocom -b 115200 /dev/ttyUSB0` or PuTTY on Windows):
+1. Wait for it to boot and hit **Enter** to get the root BusyBox prompt (`#`).
+2. Run these tcapi commands to enable Telnet permanently:
+   ```sh
+   /userfs/bin/tcapi set Account_TelnetEntry Active Yes
+   /userfs/bin/tcapi set Account_TelnetEntry telnet_port 23
+   /userfs/bin/tcapi set Account_TelnetEntry telnet_passwd admin
+   /userfs/bin/tcapi commit Account_TelnetEntry
+   /userfs/bin/tcapi set Firewall_Entry lan_telnet_enable 1
+   /userfs/bin/tcapi commit Firewall_Entry
+   /userfs/bin/tcapi save
+   ```
+3. Now Telnet is active on port 23 across your LAN!
+
+*(Tip: If you already have Web UI access, you can also just visit the hidden page directly at `http://192.168.1.1/cgi-bin/true-page/advance/telnet.asp` to toggle Telnet on!)*
 
 ---
 
@@ -21,7 +63,7 @@ Inspired by [Blinko1987's True-Fiber-T626Pro-V1.0.0.5-Firmware](https://github.c
 │   └── sha256sums.txt
 │
 ├── 2_Full_SPI_NAND_Programmer_Dump/
-│   ├── full_spi_nand_256mb_programmer.bin      # 256MB dump for CH341A / T48 / T56 programmer
+│   ├── full_spi_nand_256mb_programmer.7z       # 256MB dump for CH341A / T48 / T56 programmer
 │   └── sha256sums.txt
 │
 ├── 3_Raw_MTD_Partitions/                       # Individual partition images for nandwrite / flashcp
@@ -44,6 +86,10 @@ Inspired by [Blinko1987's True-Fiber-T626Pro-V1.0.0.5-Firmware](https://github.c
 │   ├── clean_unlocked_romfile.xml              # Sanitized XML with TR-069 ACS removed
 │   └── factory_stock_romfile.cfg               # Stock default romfile archive
 │
+├── images/                                     # Board photos and UART pinout diagrams
+│   ├── uart_board_overview.jpg
+│   └── uart_header_closeup.jpg
+│
 ├── TheFileInsideMtds/                          # Unpacked source and rootfs filesystem trees
 │
 ├── FLASHING_GUIDE.md                           # Detailed flashing & debricking manual
@@ -54,7 +100,7 @@ Inspired by [Blinko1987's True-Fiber-T626Pro-V1.0.0.5-Firmware](https://github.c
 
 ## 🛠️ Included ModPack Toolkit (ARMv7 Soft-Float)
 
-All utilities are static-PIE compiled specifically for the EcoNet EN7529CT AArch32 architecture without floating-point trap crashes:
+All utilities are static-PIE compiled specifically for EcoNet EN7529CT (AArch32 soft-float) so they never crash with illegal instruction:
 
 * **Monitoring & Administration:** `htop` (v3.3.0), `vnstat` & `vnstatd` (v1.18), `strace` (v6.7)
 * **Networking & Diagnostics:** `iperf3` (v3.22), `tcpdump` (v4.99.4 + libpcap), `drill` / `dig` (v1.8.3), `curl` (v8.7.1 with OpenSSL 1.1.1w + Mozilla CA certs), `socat` (v1.8.0), `ethtool` (v5.15), `arp-scan` (v1.10.0)
@@ -63,8 +109,10 @@ All utilities are static-PIE compiled specifically for the EcoNet EN7529CT AArch
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start & Flashing Guide
 
-* For **Web UI Flashing**, consult [FLASHING_GUIDE.md](file:///run/media/moonlight/GameLibrary/Firmware%20works/FLASHING_GUIDE.md#L18-L30).
-* For **No-Flash Toolkit Setup**, consult [FLASHING_GUIDE.md](file:///run/media/moonlight/GameLibrary/Firmware%20works/FLASHING_GUIDE.md#L32-L48).
-* For **Hardware Programmer Debricking**, consult [FLASHING_GUIDE.md](file:///run/media/moonlight/GameLibrary/Firmware%20works/FLASHING_GUIDE.md#L70-L84).
+Check out [FLASHING_GUIDE.md](file:///run/media/moonlight/GameLibrary/Firmware%20works/FLASHING_GUIDE.md) for step-by-step instructions:
+* **Web UI Upgrade:** Upload `1_WebUI_and_TFTP_Flashable/tclinux_v1.0.07_modded_bank1.bin` in the web menu.
+* **No-Flash Toolkit:** Run `install_toolkit.sh` over SSH or Telnet to get all tools instantly.
+* **Serial / TFTP Recovery:** Unbrick soft-bricked units using U-Boot TFTP.
+* **Hardware Programmer:** Unbrick completely dead boards with the full 256MB SPI NAND image.
