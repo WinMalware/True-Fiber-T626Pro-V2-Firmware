@@ -118,3 +118,4 @@ Check out [FLASHING_GUIDE.md](file:///run/media/moonlight/GameLibrary/Firmware%2
 * **Hardware Programmer:** Unbrick completely dead boards with the full 256MB SPI NAND image.
 * And let me clearify one thing, Yes i use ai, I use ai to help with this while also researching so pelase. i did some Software installation and firmware flashes but the firmware dumps and many things are hard so i had to use ai. but of course for UART headers i did a real research, You can use usb ttl serial, or... you can solder, depending how you want it
 * Also if you accidently flashed this firmware on a wrong hardware, I will not be responsibile for this. It's your own equipment.
+* Also... theres alot of sloppy and many things that is shitty in here, so... the claim "Never crash" do NOT believe it will not crash, it will eventually crash at certain situations. so careful.
