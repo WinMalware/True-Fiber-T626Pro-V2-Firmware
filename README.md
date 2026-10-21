@@ -36,7 +36,8 @@ You can solder header pins or use pogo pins / Dupont wires with your USB-to-TTL 
 
 ### 2. Steps to Unlock Telnet via UART Shell
 Once you plug the power in and open your serial terminal (`picocom -b 115200 /dev/ttyUSB0` or PuTTY on Windows):
-1. Wait for it to boot and hit **Enter** to get the root BusyBox prompt (`#`).
+1. Wait for it to boot and hit **Enter** to and Login Username: admin
+Password: $!%^kyw0rth the password may not be the same depending on the model!
 2. Run these tcapi commands to enable Telnet permanently:
    ```sh
    /userfs/bin/tcapi set Account_TelnetEntry Active Yes
